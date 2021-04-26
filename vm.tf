@@ -46,14 +46,12 @@ resource "azurerm_network_interface" "nic" {
   ip_configuration {
     name 															= "ipconfig0"
     subnet_id 												= var.subnet_id
-    private_ip_address_allocation     = local.subnet_ip_offset == null ? "dynamic" : "static"
-    
-    # if subnet_ip_offset is not set, use dynamic ip address. If load balancer is used, reserve the first ip to load balancer and assign the next ip address(es) to vm(s)
-    private_ip_address                = local.subnet_ip_offset == null ? null : var.load_balancer_param == null? cidrhost(var.subnet_prefix, local.subnet_ip_offset + each.key) : cidrhost(var.subnet_prefix, local.subnet_ip_offset + 1 + each.key)
+    private_ip_address_allocation     = "static"
+    private_ip_address                = each.value.ipaddress 
     public_ip_address_id              = var.public_ip_id     == null ? null : var.public_ip_id
   }
   
-    enable_accelerated_networking       	= local.enable_accelerated_networking
+  enable_accelerated_networking       	= local.enable_accelerated_networking
 }
 
 resource "azurerm_virtual_machine" "vm" {
