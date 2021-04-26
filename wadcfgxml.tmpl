@@ -1,0 +1,44 @@
+<WadCfg>
+	<DiagnosticMonitorConfiguration overallQuotaInMB="4096" xmlns="http://schemas.microsoft.com/ServiceHosting/2010/10/DiagnosticsConfiguration">
+		<DiagnosticInfrastructureLogs scheduledTransferLogLevelFilter="Error" sinks="ApplicationInsights.Errors"/>
+		<WindowsEventLog scheduledTransferPeriod="PT1M" sinks="ApplicationInsights.AppLogs">
+			<DataSource name="Application!*[System[(Level = 1 or Level = 2)]]"/>
+			<DataSource name="Security!*[System[(Level = 1 or Level = 2)]]"/>
+			<DataSource name="System!*[System[(Level = 1 or Level = 2)]]"/>
+		</WindowsEventLog>
+    <Logs scheduledTransferPeriod="PT1M" scheduledTransferLogLevelFilter="Verbose" sinks="ApplicationInsights.AppLogs"/> 
+		<PerformanceCounters scheduledTransferPeriod="PT1M" sinks="AzMonSink">
+			<PerformanceCounterConfiguration counterSpecifier="\Processor(_Total)\% Processor Time" sampleRate="PT15S" unit="Percent"><annotation displayName="CPU utilization" locale="en-us"/></PerformanceCounterConfiguration>
+			<PerformanceCounterConfiguration counterSpecifier="\Memory\% Committed Bytes In Use" sampleRate="PT15S" unit="Percent"><annotation displayName="Memory usage" locale="en-us"/></PerformanceCounterConfiguration>
+			<PerformanceCounterConfiguration counterSpecifier="\Memory\Available Bytes" sampleRate="PT15S" unit="Bytes"><annotation displayName="Memory available" locale="en-us"/></PerformanceCounterConfiguration>
+			<PerformanceCounterConfiguration counterSpecifier="\Memory\Committed Bytes" sampleRate="PT15S" unit="Bytes"><annotation displayName="Memory committed" locale="en-us"/></PerformanceCounterConfiguration>
+			<PerformanceCounterConfiguration counterSpecifier="\Memory\Commit Limit" sampleRate="PT15S" unit="Bytes"><annotation displayName="Memory commit limit" locale="en-us"/></PerformanceCounterConfiguration>
+			<PerformanceCounterConfiguration counterSpecifier="\Process(notepad)\ID Process" sampleRate="PT15S" unit="Count"><annotation displayName="Notepad Process ID" locale="en-us"/></PerformanceCounterConfiguration>
+			<PerformanceCounterConfiguration counterSpecifier="\TCPv4\Connections Active" sampleRate="PT15S" unit="Count"><annotation displayName="TCP connections Active" locale="en-us" /></PerformanceCounterConfiguration>
+			<PerformanceCounterConfiguration counterSpecifier="\TCPv4\Connections Established" sampleRate="PT15S" unit="Count"><annotation displayName="TCP connections established" locale="en-us" /></PerformanceCounterConfiguration>
+			<PerformanceCounterConfiguration counterSpecifier="\TCPv4\Connection Failures" sampleRate="PT15S" unit="Count"><annotation displayName="TCP connections failed" locale="en-us" /></PerformanceCounterConfiguration>
+			<PerformanceCounterConfiguration counterSpecifier="\TCPv4\Connections Reset" sampleRate="PT15S" unit="Count"><annotation displayName="TCP connections reset" locale="en-us" /></PerformanceCounterConfiguration>
+			<PerformanceCounterConfiguration counterSpecifier="\TCPv4\Segments Sent/sec" sampleRate="PT15S" unit="CountPerSecond"><annotation displayName="TCP segments sent" locale="en-us" /></PerformanceCounterConfiguration>
+			<PerformanceCounterConfiguration counterSpecifier="\TCPv4\Segments Received/sec" sampleRate="PT15S" unit="CountPerSecond"><annotation displayName="TCP segments received" locale="en-us" /></PerformanceCounterConfiguration>
+			<PerformanceCounterConfiguration counterSpecifier="\TCPv4\Segments Retransmitted/sec" sampleRate="PT15S" unit="CountPerSecond"><annotation displayName="TCP seg. restransmitted" locale="en-us" /></PerformanceCounterConfiguration>
+			<PerformanceCounterConfiguration counterSpecifier="\Web Service(Default Web Site)\Bytes Received/sec" sampleRate="PT15S" unit="CountPerSecond"><annotation displayName="Web Service(Default Web Site) Bytes Received per sec" locale="en-us"/></PerformanceCounterConfiguration>
+			<PerformanceCounterConfiguration counterSpecifier="\Web Service(Default Web Site)\Bytes Sent/sec" sampleRate="PT15S" unit="CountPerSecond"><annotation displayName="Web Service(Default Web Site) Bytes Sent per sec" locale="en-us"/></PerformanceCounterConfiguration>
+			<PerformanceCounterConfiguration counterSpecifier="\Web Service(Default Web Site)\Current Connections" sampleRate="PT15S" unit="Count"><annotation displayName="Web Service(Default Web Site) Current Connections" locale="en-us"/></PerformanceCounterConfiguration>
+			<PerformanceCounterConfiguration counterSpecifier="\Web Service(Default Web Site)\Total Method Requests/sec" sampleRate="PT15S" unit="CountPerSecond"><annotation displayName="Web Service(Default Web Site) Total Method Requests/sec" locale="en-us"/></PerformanceCounterConfiguration>
+			<PerformanceCounterConfiguration counterSpecifier="\PhysicalDisk(_Total)\% Disk Read Time" sampleRate="PT15S" unit="Percent"><annotation displayName="Disk active read time" locale="en-us"/></PerformanceCounterConfiguration>
+			<PerformanceCounterConfiguration counterSpecifier="\WFPv4\Active Outbound Connections" sampleRate="PT15S" unit="Count"><annotation displayName="WFPv4 Active Outbound Connections" locale="en-us"/></PerformanceCounterConfiguration>
+			<PerformanceCounterConfiguration counterSpecifier="\WFPv4\Active Inbound Connections" sampleRate="PT15S" unit="Count"><annotation displayName="WFPv4 Active Inbound Connections" locale="en-us"/></PerformanceCounterConfiguration>
+			<PerformanceCounterConfiguration counterSpecifier="\Event Tracing for Windows Session(TracingGuidsApmConnector)\Number of Real-Time Consumers" sampleRate="PT15S" unit="Count"><annotation displayName="Event Tracing for Windows Session. Number of Real-Time customers" locale="en-us"/></PerformanceCounterConfiguration>
+			<PerformanceCounterConfiguration counterSpecifier="\HTTP Service Url Groups(FE00000040000001)\CurrentConnections" sampleRate="PT15S" unit="Count"><annotation displayName="HTTP Service Url Groups(FE00000040000001)" locale="en-us"/></PerformanceCounterConfiguration>
+		</PerformanceCounters>
+		<Metrics resourceId="${resource_id}">
+			<MetricAggregation scheduledTransferPeriod="PT1H"/>
+			<MetricAggregation scheduledTransferPeriod="PT1M"/>
+		</Metrics>
+	</DiagnosticMonitorConfiguration>
+	<SinksConfig>
+		<Sink name="AzMonSink">
+			<AzureMonitor></AzureMonitor>
+		</Sink>
+	</SinksConfig>
+</WadCfg>
