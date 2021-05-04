@@ -36,7 +36,8 @@ resource "azurerm_proximity_placement_group" "ppg" {
 }
 
 resource "azurerm_network_interface" "nic" {
-  for_each				                      = var.instances.vm
+  for_each = { for x in var.instances.vm: x.name => x }
+  #for_each				                      = var.instances.vm
 
   name         													= "${each.value.name}-nic"
 
@@ -61,7 +62,8 @@ resource "azurerm_virtual_machine" "vm" {
 		]
   }
 
-  for_each				                      = var.instances.vm
+  #for_each				                      = var.instances.vm
+  for_each = { for x in var.instances.vm: x.name => x }
 
   name                  								= each.value.name
 
@@ -169,7 +171,8 @@ resource "azurerm_virtual_machine" "vm" {
 }
 
 resource "azurerm_network_interface_backend_address_pool_association" "association" {
-  for_each                  = var.instances.vm
+  #for_each                  = var.instances.vm
+  for_each = { for x in var.instances.vm: x.name => x }
 
   network_interface_id      = azurerm_network_interface.nic[each.key].id
   ip_configuration_name     = "ipconfig0"
@@ -177,7 +180,7 @@ resource "azurerm_network_interface_backend_address_pool_association" "associati
 }
 
 resource "azurerm_network_interface_backend_address_pool_association" "association_outbound" {
-  for_each                  = var.backend_outbound_address_pool_id == null ? {} : var.instances.vm
+  for_each                  = var.backend_outbound_address_pool_id == null ? {} : { for x in var.instances.vm: x.name => x }
 
 	network_interface_id      = azurerm_network_interface.nic[each.key].id
 	ip_configuration_name     = "ipconfig0"
@@ -186,7 +189,7 @@ resource "azurerm_network_interface_backend_address_pool_association" "associati
 
 
 resource "azurerm_network_interface_application_gateway_backend_address_pool_association" "association" {
-	for_each                  = var.backend_address_pool_id == null ? {} : var.instances.vm
+	for_each                  = var.backend_address_pool_id == null ? {} : { for x in var.instances.vm: x.name => x }
 	
 	network_interface_id      = azurerm_network_interface.nic[each.key].id
 	ip_configuration_name     = "ipconfig0"
@@ -195,7 +198,7 @@ resource "azurerm_network_interface_application_gateway_backend_address_pool_ass
 
 # Refer https://docs.microsoft.com/en-us/azure/azure-monitor/platform/diagnostics-extension-schema-windows
 resource "azurerm_virtual_machine_extension" "diagnostics" {
-	for_each                      = var.diag_storage_account_name == null ? {} : local.vm_offer == "WindowsServer" ? var.instances.vm : {}
+	for_each                      = var.diag_storage_account_name == null ? {} : local.vm_offer == "WindowsServer" ? { for x in var.instances.vm: x.name => x } : {}
 	
 	name                          = "Microsoft.Insights.VMDiagnosticsSettings"
 	#location              	      = var.location
@@ -228,7 +231,7 @@ resource "azurerm_virtual_machine_extension" "diagnostics" {
 # https://docs.microsoft.com/ko-kr/azure/virtual-machines/extensions/oms-windows 
 # https://docs.microsoft.com/ko-kr/azure/virtual-machines/extensions/oms-linux
 resource "azurerm_virtual_machine_extension" "monioring" {
-  for_each                      = var.log_analytics_workspace_id == null ? {} : var.instances.vm
+  for_each                      = var.log_analytics_workspace_id == null ? {} : { for x in var.instances.vm: x.name => x } 
 
 	name 						              = "OMSExtension" 
 	#location 					            = var.location
@@ -254,7 +257,7 @@ resource "azurerm_virtual_machine_extension" "monioring" {
 }
 
 resource "azurerm_virtual_machine_extension" "network_watcher" {
-  for_each                      = var.enable_network_watcher_extension == true ? var.instances.vm : {}
+  for_each                      = var.enable_network_watcher_extension == true ? { for x in var.instances.vm: x.name => x } : {}
 
 	name 						              = "Microsoft.Azure.NetworkWatcher" 
 	#location 					            = var.location
@@ -269,7 +272,7 @@ resource "azurerm_virtual_machine_extension" "network_watcher" {
 }
 
 resource "azurerm_virtual_machine_extension" "dependency_agent" {
-  for_each                      = var.enable_dependency_agent == true ? var.instances.vm : {}
+  for_each                      = var.enable_dependency_agent == true ? { for x in var.instances.vm: x.name => x } : {}
 	
 	name 						              = "DependencyAgentWindows" 
 	#location 					            = var.location
@@ -284,7 +287,7 @@ resource "azurerm_virtual_machine_extension" "dependency_agent" {
 }
 
 resource "azurerm_virtual_machine_extension" "aadlogin" {
-    for_each                      = var.enable_aadlogin == true ? var.instances.vm : {}
+    for_each                      = var.enable_aadlogin == true ? { for x in var.instances.vm: x.name => x } : {}
     
     name                          = "ext-aadlogin"
 	  virtual_machine_id						= azurerm_virtual_machine.vm[each.key].id
@@ -322,7 +325,7 @@ resource "azurerm_virtual_machine_extension" "iis" {
 
 
 resource "azurerm_network_interface_application_gateway_backend_address_pool_association" "association2" {
-  for_each                  = var.backend_address_pool_id2 == null ? {} : var.instances.vm
+  for_each                  = var.backend_address_pool_id2 == null ? {} : { for x in var.instances.vm: x.name => x } 
 	
 	network_interface_id      = azurerm_network_interface.nic[each.key].id
 	ip_configuration_name     = "ipconfig0"
