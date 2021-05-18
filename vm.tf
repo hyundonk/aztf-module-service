@@ -58,7 +58,8 @@ resource "azurerm_network_interface" "nic" {
 resource "azurerm_virtual_machine" "vm" {
   lifecycle {
     ignore_changes = [ # don't recreate existing disk
-      storage_os_disk
+      storage_os_disk,
+      tags
 		]
   }
 
