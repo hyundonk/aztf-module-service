@@ -1,5 +1,11 @@
 
 resource "azurerm_lb" "lb" {
+  lifecycle {
+    ignore_changes = [ # don't change existing tags
+      tags,
+    ]
+  }
+	
   count                 = var.load_balancer_param == null ? 0 : 1
   name		              = "${var.name}-lb"
   location              = var.location
