@@ -45,6 +45,12 @@ resource "azurerm_lb_backend_address_pool" "lb" {
 }
 
 resource "azurerm_lb_rule" "https" {
+  lifecycle {
+    ignore_changes = [ # don't recreate existing disk
+      probe_id
+		]
+  }
+
   count                           = var.load_balancer_param == null ? 0 : 1
 
   resource_group_name             = azurerm_lb.lb.0.resource_group_name
