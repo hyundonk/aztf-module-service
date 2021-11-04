@@ -207,3 +207,7 @@ variable "license_type" {
   default = null
 }
 
+variable "dns_servers" {
+  default = null
+}
+

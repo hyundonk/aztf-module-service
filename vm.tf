@@ -51,7 +51,8 @@ resource "azurerm_network_interface" "nic" {
     private_ip_address                = each.value.ipaddress 
     public_ip_address_id              = var.public_ip_id     == null ? null : var.public_ip_id
   }
-  
+ 
+  dns_servers = var.dns_servers == null ? null : var.dns_servers
   enable_accelerated_networking       	= local.enable_accelerated_networking
 }
 
