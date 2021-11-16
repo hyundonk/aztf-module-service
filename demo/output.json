@@ -1,0 +1,17 @@
+[
+    {
+        "servicename": "TEST",
+        "vm_size": "Standard_F4s_v2",
+        "subnet": "frontend",
+        "subnet_ip_offset": "20",
+        "vm_offer": "WindowsServer",
+        "os_disk_size": "300",
+        "vm": [
+            {
+                "name": "TEST01AZ",
+                "ipaddress": "10.10.0.21",
+                "image_id": "/subscriptions/{subscription-id-here}/resourceGroups/rg-image/providers/Microsoft.Compute/images/win2016"
+            }
+        ]
+    }
+]
