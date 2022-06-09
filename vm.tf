@@ -174,10 +174,9 @@ resource "azurerm_virtual_machine" "vm" {
 }
 
 resource "azurerm_network_interface_backend_address_pool_association" "association" {
-  #for_each                  = var.instances.vm
-  for_each = { for x in var.instances.vm: x.name => x }
+  count                     = var.load_balancer_param == null ? 0 : (local.subnet_ip_offset == 0 ? 0 : var.instances.vm)
 
-  network_interface_id      = azurerm_network_interface.nic[each.key].id
+  network_interface_id      = azurerm_network_interface.nic[count.index].id
   ip_configuration_name     = "ipconfig0"
   backend_address_pool_id   = azurerm_lb_backend_address_pool.lb.0.id
 }
