@@ -6,7 +6,8 @@ resource "azurerm_lb" "lb" {
     ]
   }
 	
-  count                 = var.load_balancer_param == null ? 0 : 1
+  count                 = var.load_balancer_param == null ? 0 : (local.subnet_ip_offset == 0 ? 0 : 1)
+	
   name		              = "${var.name}-lb"
   location              = var.location
 	resource_group_name  	= var.resource_group_name
@@ -24,7 +25,7 @@ resource "azurerm_lb" "lb" {
 }
 
 resource "azurerm_lb_probe" "probe" {
-  count                 = var.load_balancer_param == null ? 0 : 1
+  count                 = var.load_balancer_param == null ? 0 : (local.subnet_ip_offset == 0 ? 0 : 1)
 
   resource_group_name   = azurerm_lb.lb.0.resource_group_name
   loadbalancer_id       = azurerm_lb.lb.0.id
@@ -37,7 +38,7 @@ resource "azurerm_lb_probe" "probe" {
 }
 
 resource "azurerm_lb_backend_address_pool" "lb" {
-  count                 = var.load_balancer_param == null ? 0 : 1
+  count                 = var.load_balancer_param == null ? 0 : (local.subnet_ip_offset == 0 ? 0 : 1)
 
   resource_group_name   = azurerm_lb.lb.0.resource_group_name
   loadbalancer_id       = azurerm_lb.lb.0.id
@@ -51,7 +52,7 @@ resource "azurerm_lb_rule" "https" {
 		]
   }
 
-  count                           = var.load_balancer_param == null ? 0 : 1
+  count                 = var.load_balancer_param == null ? 0 : (local.subnet_ip_offset == 0 ? 0 : 1)
 
   resource_group_name             = azurerm_lb.lb.0.resource_group_name
   loadbalancer_id                 = azurerm_lb.lb.0.id
@@ -75,7 +76,7 @@ resource "azurerm_lb_rule" "https" {
 }
 
 resource "azurerm_lb_rule" "http" {
-  count                           = var.load_balancer_param == null ? 0 : 1
+  count                 = var.load_balancer_param == null ? 0 : (local.subnet_ip_offset == 0 ? 0 : 1)
   
   resource_group_name             = azurerm_lb.lb.0.resource_group_name
   loadbalancer_id                 = azurerm_lb.lb.0.id
