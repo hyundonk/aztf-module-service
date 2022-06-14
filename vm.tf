@@ -231,14 +231,10 @@ resource "azurerm_virtual_machine_extension" "diagnostics" {
 }
 
 resource "azurerm_virtual_machine_extension" "diagnostics_linux" {
-  count                         = var.diag_storage_account_name == null ? 0 : local.vm_offer != "WindowsServer" ? local.vm_num : 0
+  for_each                      = var.diag_storage_account_name == null ? {} : local.vm_offer == "WindowsServer" ? {} : { for x in var.instances.vm: x.name => x } 
 
   name                          = "LinuxDiagnostic"
-  #location                     = var.location
-  #resource_group_name            = var.resource_group_name
-
-  virtual_machine_id            = element(azurerm_virtual_machine.vm.*.id, count.index)
-  #virtual_machine_name           = element(azurerm_virtual_machine.vm.*.name, count.index)
+  virtual_machine_id            = azurerm_virtual_machine.vm[each.key].id
 
   publisher                     = "Microsoft.Azure.Diagnostics"
   type                          = "LinuxDiagnostic"
@@ -247,7 +243,7 @@ resource "azurerm_virtual_machine_extension" "diagnostics_linux" {
   auto_upgrade_minor_version    = true
 
 
-  settings = templatefile("${path.module}/ladcfg2json.tmpl", {storageAccountName = local.storageAccountName, resourceId = element(azurerm_virtual_machine.vm.*.id, count.index)})
+  settings = templatefile("${path.module}/ladcfg2json.tmpl", {storageAccountName = local.storageAccountName, resourceId = azurerm_virtual_machine.vm[each.key].id})
 
   protected_settings = <<SETTINGS
   {
