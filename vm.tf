@@ -230,6 +230,33 @@ resource "azurerm_virtual_machine_extension" "diagnostics" {
 	SETTINGS
 }
 
+resource "azurerm_virtual_machine_extension" "diagnostics_linux" {
+  count                         = var.diag_storage_account_name == null ? 0 : local.vm_offer != "WindowsServer" ? local.vm_num : 0
+
+  name                          = "LinuxDiagnostic"
+  #location                     = var.location
+  #resource_group_name            = var.resource_group_name
+
+  virtual_machine_id            = element(azurerm_virtual_machine.vm.*.id, count.index)
+  #virtual_machine_name           = element(azurerm_virtual_machine.vm.*.name, count.index)
+
+  publisher                     = "Microsoft.Azure.Diagnostics"
+  type                          = "LinuxDiagnostic"
+  type_handler_version          = "4.0"
+
+  auto_upgrade_minor_version    = true
+
+
+  settings = templatefile("${path.module}/ladcfg2json.tmpl", {storageAccountName = local.storageAccountName, resourceId = element(azurerm_virtual_machine.vm.*.id, count.index)})
+
+  protected_settings = <<SETTINGS
+  {
+    "storageAccountName": "${local.storageAccountName}",
+    "storageAccountSasToken" : "${var.diag_storage_account_sas_key}"
+  }
+  SETTINGS
+}
+	
 # https://docs.microsoft.com/ko-kr/azure/virtual-machines/extensions/oms-windows 
 # https://docs.microsoft.com/ko-kr/azure/virtual-machines/extensions/oms-linux
 resource "azurerm_virtual_machine_extension" "monioring" {
