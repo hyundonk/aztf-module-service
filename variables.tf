@@ -125,6 +125,11 @@ variable "diag_storage_account_endpoint"  {
   default = null      
 }
 
+variable "diag_storage_account_sas_key"  {
+  description = "storage account sas key for diagnostics log"
+  default = null      
+}
+
 variable "log_analytics_workspace_id"  {
   description = "log analytics workspace ID for diagnostics log"
   default = null      
@@ -210,4 +215,5 @@ variable "license_type" {
 variable "dns_servers" {
   default = null
 }
+
 
