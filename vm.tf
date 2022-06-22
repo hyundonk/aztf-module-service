@@ -13,7 +13,7 @@ locals {
 }
 
 resource "azurerm_availability_set" "avset" {
-  count                         = var.load_balancer_param == null ? 0 : 1 # create only if load balancer exists
+  #count                         = var.load_balancer_param == null ? 0 : 1 # create only if load balancer exists
 
   name                  	      = "${var.name}-avset"
   location              	      = var.location
@@ -76,8 +76,9 @@ resource "azurerm_virtual_machine" "vm" {
   delete_os_disk_on_termination 				= true
   delete_data_disks_on_termination 			= true
 
-  availability_set_id                   = var.load_balancer_param == null ? null : azurerm_availability_set.avset.0.id
-
+  #availability_set_id                   = var.load_balancer_param == null ? null : azurerm_availability_set.avset.0.id
+  availability_set_id                   = azurerm_availability_set.avset.id
+	  
   proximity_placement_group_id          = var.enable_proximity_place_group == true ? azurerm_proximity_placement_group.ppg.0.id : null
 
   storage_image_reference {
