@@ -60,6 +60,7 @@ resource "azurerm_virtual_machine" "vm" {
   lifecycle {
     ignore_changes = [ # don't recreate existing disk
       storage_os_disk,
+      availability_set_id,
       tags
 		]
   }
