@@ -1,4 +1,4 @@
-# aztf-module-vm
+# aztf-module-service
 
 This is terraform module for deploying azure virtual machine(s).
 
