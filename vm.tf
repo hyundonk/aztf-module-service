@@ -85,10 +85,10 @@ resource "azurerm_virtual_machine" "vm" {
 
   storage_image_reference {
     id                    = each.value.image_id
-    publisher             = null
-    offer                 = null
-    sku                   = null
-    version               = null
+    publisher             = var.image_reference != null ? var.image_reference.publisher : null
+    offer                 = var.image_reference != null ? var.image_reference.offer : null
+    sku                   = var.image_reference != null ? var.image_reference.sku : null
+    version               = var.image_reference != null ? var.image_reference.version : null
   }
 
   storage_os_disk {
@@ -96,7 +96,7 @@ resource "azurerm_virtual_machine" "vm" {
     caching       		    = "ReadWrite"
     create_option 		    = "FromImage"
     managed_disk_type     = "StandardSSD_LRS"
-    disk_size_gb          = var.os_disk_size == null ? 300 : var.os_disk_size 
+    disk_size_gb          = var.image_reference != null ? null : (var.os_disk_size == null ? 300 : var.os_disk_size)
   }
 
   identity { # added to enable 'Azure Monitor Sink' feature
@@ -107,7 +107,7 @@ resource "azurerm_virtual_machine" "vm" {
     computer_name					= each.value.name
     admin_username        = var.admin_username
     admin_password        = var.admin_password
-    custom_data           = var.custom_data == null ? null : var.custom_data
+    custom_data           = var.custom_data == true ? filebase64("${each.value.name}-config.txt") : null
     #custom_data           = var.custom_data == null ? null : filebase64(var.custom_data)
   }
 /*  
@@ -167,6 +167,16 @@ resource "azurerm_virtual_machine" "vm" {
     }
   }
 
+  dynamic "plan" {
+    for_each = var.plan == null ? [] : ["plan"]
+
+    content {
+      name      = var.plan.name
+      product   = var.plan.product
+      publisher = var.plan.publisher
+    }
+	}
+	
   #network_interface_ids  = [element(azurerm_network_interface.nic.*.id, count.index)]
   #network_interface_ids   = [element(concat(azurerm_network_interface.nic.*.id, list("")), count.index)]
   network_interface_ids   = [azurerm_network_interface.nic[each.key].id]

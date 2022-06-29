@@ -22,6 +22,14 @@ variable "instances_defaults" {
 	}
 }
 
+variable "image_reference" {
+  default = null
+}
+
+variable "plan" {
+  default = null
+}
+
 variable "data_disk" {
   default = {}
 }
@@ -109,6 +117,12 @@ variable "custom_data" {
   description = "local path to custom data file for cloud_init"
   default = null
 }
+
+variable "custom_data_prefix" {
+  description = "local path prefix to custom data file for cloud_init"
+  default = null
+}
+
 
 variable "diag_storage_account_name"        {
   description = "storage account name for diagnostics log"
