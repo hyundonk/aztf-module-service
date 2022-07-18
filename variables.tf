@@ -213,6 +213,10 @@ variable "os_disk_size" {
   default = null	
 }
 
+variable "os_disk_type" {
+  default = "StandardSSD_LRS" 
+}
+
 variable "data_disk_size" {
   description = "Data Disk Size in GB"
   default = null	
