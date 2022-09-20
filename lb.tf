@@ -19,6 +19,9 @@ resource "azurerm_lb" "lb" {
     subnet_id                     = var.subnet_id
     private_ip_address            = local.subnet_ip_offset == null ? null : cidrhost(var.subnet_prefix, local.subnet_ip_offset)
     private_ip_address_allocation = local.subnet_ip_offset == null ? "dynamic" : "static"
+
+#   it will be zone-redundant frontend ip when zones are not specified.
+#    zones = var.use_availability_zone == true ? ["1", "2", "3"] : null
   }
 
   tags = var.tags_lb

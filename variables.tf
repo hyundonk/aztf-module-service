@@ -234,4 +234,8 @@ variable "dns_servers" {
   default = null
 }
 
+variable "use_availability_zone" {
+  default = false
+}
+
 
