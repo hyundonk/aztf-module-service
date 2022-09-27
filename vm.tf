@@ -228,12 +228,15 @@ resource "azurerm_virtual_machine_extension" "diagnostics" {
 
 	auto_upgrade_minor_version    = true
 
-	settings = <<SETTINGS
-	{
-		"xmlCfg"            :  "${base64encode(templatefile("${path.module}/wadcfgxml.tmpl", { resource_id = azurerm_virtual_machine.vm[each.key].id}))}",
-    "storageAccount"    : "${local.storageAccountName}"
-	}
-	SETTINGS
+  settings = templatefile("${path.module}/wadcfgjson.tmpl", {storageAccountName = local.storageAccountName, resourceId = azurerm_virtual_machine.vm[each.key].id})
+
+#	settings = <<SETTINGS
+#	{
+#		"xmlCfg"            :  "${base64encode(templatefile("${path.module}/wadcfgxml.tmpl", { resource_id = azurerm_virtual_machine.vm[each.key].id}))}",
+#    "storageAccount"    : "${local.storageAccountName}"
+#	}
+#	SETTINGS
+
 	protected_settings = <<SETTINGS
 	{
     "storageAccountName": "${local.storageAccountName}",
@@ -243,6 +246,7 @@ resource "azurerm_virtual_machine_extension" "diagnostics" {
 	SETTINGS
 }
 
+/*
 resource "azurerm_virtual_machine_extension" "diagnostics_linux" {
   for_each                      = var.diag_storage_account_name == null ? {} : local.vm_offer == "WindowsServer" ? {} : { for x in var.instances.vm: x.name => x } 
 
@@ -265,6 +269,7 @@ resource "azurerm_virtual_machine_extension" "diagnostics_linux" {
   }
   SETTINGS
 }
+*/
 	
 # https://docs.microsoft.com/ko-kr/azure/virtual-machines/extensions/oms-windows 
 # https://docs.microsoft.com/ko-kr/azure/virtual-machines/extensions/oms-linux

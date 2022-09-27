@@ -63,6 +63,16 @@ resource "azurerm_public_ip" "example" {
   sku                 = "Standard"
 }
 
+resource "azurerm_public_ip" "testvm" {
+  name                = "testvm-pip"
+  resource_group_name      = local.RESOURCEGROUP
+  location                 = var.location
+ 
+  allocation_method   = "Static"
+  sku                 = "Standard"
+}
+
+
 
 resource "azurerm_nat_gateway" "example" {
   name                    = "nat-gateway"
@@ -110,16 +120,17 @@ module "demo-vm" {
   admin_password                    = local.adminpassword
 
   boot_diagnostics_endpoint         = azurerm_storage_account.example.primary_blob_endpoint
-
-	diag_storage_account_name         = azurerm_storage_account.example.id
+	
+  diag_storage_account_name         = azurerm_storage_account.example.id
   diag_storage_account_access_key   = azurerm_storage_account.example.primary_access_key
   diag_storage_account_endpoint			= azurerm_storage_account.example.primary_blob_endpoint
 
-
-  log_analytics_workspace_id        = module.log_analytics.object.workspace_id
-  log_analytics_workspace_key       = module.log_analytics.object.primary_shared_key
+  log_analytics_workspace_id        = null #module.log_analytics.object.workspace_id
+  log_analytics_workspace_key       = null # module.log_analytics.object.primary_shared_key
   
   load_balancer_param               = var.load_balancer_param
+
+  public_ip_id                      = azurerm_public_ip.testvm.id
 }
 
 
