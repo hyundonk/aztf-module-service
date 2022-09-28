@@ -134,14 +134,14 @@ resource "azurerm_virtual_machine" "vm" {
   }
  
   dynamic "os_profile_windows_config" {
-    for_each = local.vm_offer == "WindowsServer" ? ["WindowsServer"] : []
+    for_each = try(each.value.vm_offer, null) == null ? (local.vm_offer == "WindowsServer" ? ["WindowsServer"] : []) : (each.value.vm_offer == "WindowsServer" ? ["WindowsServer"] : [])
     content {
       provision_vm_agent    = true
     }
   }
 
   dynamic "os_profile_linux_config" {
-    for_each = local.vm_offer == "WindowsServer" ? [] : var.ssh_key_data != null ? [1] : []
+    for_each = try(each.value.vm_offer, null) == null ? (local.vm_offer == "WindowsServer" ? [] : var.ssh_key_data != null ? [1] : []) : (each.value.vm_offer == "WindowsServer" ? [] : var.ssh_key_data != null ? [1] : [])
     content {
       disable_password_authentication = true
       ssh_keys {
@@ -151,9 +151,9 @@ resource "azurerm_virtual_machine" "vm" {
     }
 
   }
-	
+
   dynamic "os_profile_linux_config" {
-    for_each = local.vm_offer == "WindowsServer" ? [] : var.ssh_key_data != null ? [] : [1]
+    for_each = try(each.value.vm_offer, null) == null ? (local.vm_offer == "WindowsServer" ? [] : var.ssh_key_data != null ? [] : [1]) : (each.value.vm_offer == "WindowsServer" ? [] : var.ssh_key_data != null ? [] : [1])
     content {
       disable_password_authentication = false
     }
@@ -181,7 +181,7 @@ resource "azurerm_virtual_machine" "vm" {
   #network_interface_ids   = [element(concat(azurerm_network_interface.nic.*.id, list("")), count.index)]
   network_interface_ids   = [azurerm_network_interface.nic[each.key].id]
 
-  license_type            = local.vm_offer == "WindowsServer" ? var.license_type : null
+  license_type            = try(each.value.vm_offer, null) == null ? (local.vm_offer == "WindowsServer" ? var.license_type : null) : (each.value.vm_offer == "WindowsServer" ? var.license_type : null)
 
   tags = var.tags
 }
@@ -213,7 +213,7 @@ resource "azurerm_network_interface_application_gateway_backend_address_pool_ass
 
 # Refer https://docs.microsoft.com/en-us/azure/azure-monitor/platform/diagnostics-extension-schema-windows
 resource "azurerm_virtual_machine_extension" "diagnostics" {
-	for_each                      = var.diag_storage_account_name == null ? {} : local.vm_offer == "WindowsServer" ? { for x in var.instances.vm: x.name => x } : {}
+  for_each                      = var.diag_storage_account_name == null ? {} : local.vm_offer == "WindowsServer" ? { for x in var.instances.vm: x.name => x } : {}
 	
 	name                          = "Microsoft.Insights.VMDiagnosticsSettings"
 	#location              	      = var.location
@@ -248,7 +248,7 @@ resource "azurerm_virtual_machine_extension" "diagnostics" {
 
 /*
 resource "azurerm_virtual_machine_extension" "diagnostics_linux" {
-  for_each                      = var.diag_storage_account_name == null ? {} : local.vm_offer == "WindowsServer" ? {} : { for x in var.instances.vm: x.name => x } 
+  for_each                      = var.diag_storage_account_name == null ? {} : try(each.value.vm_offer) == null ? (local.vm_offer == "WindowsServer" ? {} : { for x in var.instances.vm: x.name => x }) : (each.value.vm_offer == "WindowsServer" ? {} : { for x in var.instances.vm: x.name => x })
 
   name                          = "LinuxDiagnostic"
   virtual_machine_id            = azurerm_virtual_machine.vm[each.key].id
@@ -283,8 +283,9 @@ resource "azurerm_virtual_machine_extension" "monioring" {
 	#virtual_machine_name   		    = element(azurerm_virtual_machine.vm.*.name, count.index)
 
 	publisher 					          = "Microsoft.EnterpriseCloud.Monitoring"
-	type 						              = local.vm_offer == "WindowsServer" ? "MicrosoftMonitoringAgent" : "OmsAgentForLinux"
-	type_handler_version 		      = local.vm_offer == "WindowsServer" ? "1.0" : "1.7"
+	type 						              = try(each.value.vm_offer, null) == null ? (local.vm_offer == "WindowsServer" ? "MicrosoftMonitoringAgent" : "OmsAgentForLinux") : (each.value.vm_offer == "WindowsServer" ? "MicrosoftMonitoringAgent" : "OmsAgentForLinux")
+
+	type_handler_version 		      = try(each.value.vm_offer, null) == null ? (local.vm_offer == "WindowsServer" ? "1.0" : "1.7") : (each.value.vm_offer == "WindowsServer" ? "1.0" : "1.7")
 	auto_upgrade_minor_version 	  = true
 
 	settings = <<SETTINGS
@@ -309,7 +310,7 @@ resource "azurerm_virtual_machine_extension" "network_watcher" {
 	#virtual_machine_name   		    = element(azurerm_virtual_machine.vm.*.name, count.index)
 	
 	publisher 					          = "Microsoft.Azure.NetworkWatcher"
-	type 						              = local.vm_offer == "WindowsServer" ? "NetworkWatcherAgentWindows" : "NetworkWatcherAgentLinux"
+	type 						              = try(each.value.vm_offer, null) == null ? (local.vm_offer == "WindowsServer" ? "NetworkWatcherAgentWindows" : "NetworkWatcherAgentLinux") : (each.value.vm_offer == "WindowsServer" ? "NetworkWatcherAgentWindows" : "NetworkWatcherAgentLinux")
 	type_handler_version 		      = "1.4"
 	auto_upgrade_minor_version 	  = true
 }
@@ -324,7 +325,7 @@ resource "azurerm_virtual_machine_extension" "dependency_agent" {
 	#virtual_machine_name   		    = element(azurerm_virtual_machine.vm.*.name, count.index)
 	
 	publisher 					          = "Microsoft.Azure.Monitoring.DependencyAgent"
-	type 						              = local.vm_offer == "WindowsServer" ? "DependencyAgentWindows" : "DependencyAgentLinux"
+	type 						              = try(each.value.vm_offer, null) == null ? (local.vm_offer == "WindowsServer" ? "DependencyAgentWindows" : "DependencyAgentLinux") : (each.value.vm_offer == "WindowsServer" ? "DependencyAgentWindows" : "DependencyAgentLinux")
 	type_handler_version 		      = "9.5"
 	auto_upgrade_minor_version 	  = true
 }

@@ -10,8 +10,9 @@
             {
                 "name": "TEST01AZ",
                 "ipaddress": "10.10.0.21",
-                "image_id": "/subscriptions/87b7ed75-7074-41d6-9b53-3bf8894138bb/resourceGroups/hyuk-image-gallery/providers/Microsoft.Compute/images/win2016custom",
-                "zone": "1"
+                "image_id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/hyuk-image-gallery/providers/Microsoft.Compute/images/win2016custom",
+                "zone": "1",
+                "vm_offer": "LinuxServer"
             }
         ]
     }
