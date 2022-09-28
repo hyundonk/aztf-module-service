@@ -213,7 +213,7 @@ resource "azurerm_network_interface_application_gateway_backend_address_pool_ass
 
 # Refer https://docs.microsoft.com/en-us/azure/azure-monitor/platform/diagnostics-extension-schema-windows
 resource "azurerm_virtual_machine_extension" "diagnostics" {
-  for_each                      = var.diag_storage_account_name == null ? {} : local.vm_offer == "WindowsServer" ? { for x in var.instances.vm: x.name => x } : {}
+  for_each                      = var.diag_storage_account_name == null ? {} : local.vm_offer == "WindowsServer" ? { for x in var.instances.vm: x.name => x if try(x.vm_offer, null) != "LinuxServer"} : {}
 	
 	name                          = "Microsoft.Insights.VMDiagnosticsSettings"
 	#location              	      = var.location
