@@ -52,7 +52,7 @@ resource "azurerm_network_interface" "nic" {
     public_ip_address_id              = var.public_ip_id     == null ? null : var.public_ip_id
   }
  
-  dns_servers = var.dns_servers == null ? null : var.dns_servers
+  dns_servers = try(each.value.dns_servers, null) == null ? (var.dns_servers == null ? null : var.dns_servers) : each.value.dns_servers
   enable_accelerated_networking       	= local.enable_accelerated_networking
 }
 
